@@ -36,7 +36,7 @@ Router.post("/login", async (req, res) => {
   }
 });
 
-Router.get("/users", (req, res) => {
+Router.get("/users", secure, (req, res) => {
   Users.find()
     .then((result) => {
       if (result) {
