@@ -5,6 +5,7 @@ const session = require("express-session");
 const sessionStore = require("connect-session-knex")(session);
 
 const userRouter = require("./user/userRouter");
+const authRouter = require("./auth/authRouter");
 
 const server = express();
 
@@ -32,7 +33,8 @@ server.use(
     }),
   })
 );
-server.use("/auth", userRouter);
+server.use("/auth", authRouter);
+server.use("/user", userRouter);
 
 server.get("/", (req, res) => {
   res.send(`

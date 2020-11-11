@@ -1,40 +1,26 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
 
 const Users = require("./userModels");
 
 const Router = express.Router();
 
-Router.post("/register", async (req, res) => {
-  try {
-    const { username, password, department } = req.body;
-    const hashed = bcrypt.hashSync(password, 10);
-    // we will insert a record WITHOUT the raw password but the hash instead
-    const user = { username, password: hashed, department };
-    const addedUser = await Users.add(user);
-    // send back the record to the client
-    res.json(addedUser);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// function roleChecker(role) {
+//   return function (req, res, next) {
+//     if (req.decodedJwt.role === role) {
+//       next();
+//     } else {
+//       res.status(401).json({ message: "you can't have access" });
+//     }
+//   };
+// }
 
-Router.post("/login", async (req, res) => {
-  try {
-    const { username } = req.body;
-    const user = await Users.findBy({ username });
-
-    const password = await req.body.password;
-    if (user && bcrypt.compare(password, user.password)) {
-      req.session.user = user;
-      res.json({ message: "Successful login" });
-    } else {
-      res.status(401).json({ message: "Bad credentials" });
-    }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// Router.get("/", roleChecker(1), (req, res) => {
+//   Users.find()
+//     .then((users) => {
+//       res.status(200).json(users);
+//     })
+//     .catch((err) => res.send(err));
+// });
 
 Router.get("/users", secure, (req, res) => {
   Users.find()
@@ -48,18 +34,6 @@ Router.get("/users", secure, (req, res) => {
     .catch((err) => {
       res.status(500).json({ message: "Something went wrong" });
     });
-});
-
-Router.get("/logout", (req, res) => {
-  if (req.session) {
-    req.session.destroy((err) => {
-      if (err) {
-        res.send("error logging out");
-      } else {
-        res.send("User logged out");
-      }
-    });
-  }
 });
 
 function secure(req, res, next) {
